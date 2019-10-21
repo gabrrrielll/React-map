@@ -2,7 +2,7 @@ import React from "react";
 import { GoogleApiWrapper, InfoWindow, Marker } from "google-maps-react";
 import axios from "axios";
 import CurrentLocation from "./Map";
-import "./styles.scss";
+import "./style.css";
 
 export class MapContainer extends React.Component {
     constructor(props) {
@@ -38,7 +38,7 @@ export class MapContainer extends React.Component {
         axios
             .get("https://api.timezonedb.com/v2.1/get-time-zone?key=6F6YBU30VGBM&format=json&by=position&lat=" + lat + "&lng=" + lng, { mode: "no-cors" })
             .then(response => {
-                console.log("checkTimeZone response->", response.data);
+                //console.log("checkTimeZone response->", response.data);
                 this.setState({ countryName: response.data.countryName, localTimeStamp: response.data.timestamp });
                 if (response.data.timestamp) this.checkDayLimit(lat, lng, response.data.timestamp);
             })
@@ -53,9 +53,10 @@ export class MapContainer extends React.Component {
                 console.log("checkTimeZone response->", response.data);
                 var sunriseTime = new Date(response.data.results.sunrise).getTime() / 1000; //extract sunrise time and convert in UNIX time
                 var sunsetTime = new Date(response.data.results.sunset).getTime() / 1000; //extras sunset time and convert in UNIX time
+                var time = new Date(response.data.results.sunrise).getTimezoneOffset() * 60 + localTimeStamp;
 
-                //console.log("sunrise to compare--->", sunriseTime, time, sunsetTime)
-                if (sunriseTime < localTimeStamp && localTimeStamp < sunsetTime) {
+                console.log("sunrise to compare--->", sunriseTime, time, sunsetTime);
+                if (sunriseTime < time && time < sunsetTime) {
                     //compare time to check if the time is in the day limits
                     this.setState({ dayStatus: "Daylight" });
                 } else {
